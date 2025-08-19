@@ -61,19 +61,21 @@
     "@vitejs/plugin-react": "^4.7.0",
     "commitlint": "^19.8.1",
     "dotenv": "^17.2.1",
+    "esbuild": "^0.25.9",
     "eslint": "^9.32.0",
     "eslint-plugin-react": "^7.37.5",
     "eslint-plugin-react-hooks": "^5.2.0",
     "husky": "^9.1.7",
     "jsdom": "^26.1.0",
     "lint-staged": "^16.1.2",
+    "playwright-qase-reporter": "^2.1.4",
     "prettier": "^3.6.2",
     "prop-types": "^15.8.1",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "rollup": "^4.46.3",
     "typescript": "^5.9.2",
-    "vitest": "^3.2.4",
-    "playwright-qase-reporter": "^2.1.4"
+    "vitest": "^3.2.4"
   },
   "lint-staged": {
     "*.{js,jsx,ts,tsx}": [
@@ -88,8 +90,6 @@
     ]
   },
   "dependencies": {
-    "@esbuild/darwin-arm64": "^0.25.8",
-    "@rollup/rollup-darwin-arm64": "^4.46.2",
     "express": "^4.18.2",
     "posthog-js": "^1.258.5"
   }
