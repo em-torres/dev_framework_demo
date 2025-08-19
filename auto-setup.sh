@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# Enhanced AI-Powered SDLC Setup Script
+# AI-Powered SDLC Setup Script (Cline-Free Version)
 # Supports Laravel + TypeScript React projects
 
 set -e
@@ -15,7 +15,9 @@ echo_color() {
   echo -e "${1}${2}${NC}"
 }
 
-echo_color $GREEN "🚀 Setting up AI-SDLC stack..."
+echo_color $GREEN "🚀 AI-SDLC Single Command Setup"
+echo_color $GREEN "   This is the ONLY setup command you need!"
+echo ""
 
 ### PREREQUISITES CHECK
 check_prerequisites() {
@@ -23,7 +25,7 @@ check_prerequisites() {
   command -v node >/dev/null 2>&1 || { echo_color $RED "❌ Node.js is required."; exit 1; }
   command -v npm >/dev/null 2>&1 || { echo_color $RED "❌ npm is required."; exit 1; }
   command -v git >/dev/null 2>&1 || { echo_color $RED "❌ Git is required."; exit 1; }
-  
+
   # Check if we're in a git repository
   if ! git rev-parse --git-dir > /dev/null 2>&1; then
     echo_color $RED "❌ This script must be run inside a Git repository."
@@ -41,15 +43,27 @@ check_prerequisites() {
 install_common_dependencies() {
   echo_color $YELLOW "📦 Installing shared developer dependencies..."
   npm install --save-dev eslint prettier husky lint-staged commitlint @commitlint/config-conventional
-  
+
+  # Install Playwright and testing dependencies
+  echo_color $YELLOW "🤖 Installing testing automation..."
+  npm install --save-dev @playwright/test playwright-qase-reporter
+
+  # Install TypeScript ESLint support if TypeScript is detected
+  if [[ -f "tsconfig.json" ]] || find . -name "*.ts" -o -name "*.tsx" | head -1 | grep -q .; then
+    echo_color $YELLOW "📝 TypeScript detected - installing ESLint TypeScript support..."
+    npm install --save-dev @typescript-eslint/parser @typescript-eslint/eslint-plugin
+  fi
+
   # Modern Husky v8+ initialization
   echo_color $YELLOW "🪝 Setting up Git hooks with Husky..."
   npx husky init
-  
-  # Create pre-commit hook
-  echo "npx lint-staged" > .husky/pre-commit
+
+  # Create pre-commit hook (modern Husky format)
+  cat > .husky/pre-commit << 'EOF'
+npx lint-staged
+EOF
   chmod +x .husky/pre-commit
-  
+
   echo_color $GREEN "✔️ Git hooks configured successfully."
 }
 
@@ -106,24 +120,66 @@ detect_and_setup_project() {
 setup_basic_configuration() {
   echo_color $YELLOW "⚙️ Setting up basic configuration files..."
 
-  # Create basic ESLint config if none exists
-  if [[ ! -f ".eslintrc.js" ]] && [[ ! -f ".eslintrc.json" ]]; then
-    cat > .eslintrc.js << 'EOF'
-module.exports = {
-  env: {
-    browser: true,
-    es2021: true,
-    node: true,
+  # Create ESLint config based on project type
+  if [[ ! -f ".eslintrc.js" ]] && [[ ! -f ".eslintrc.json" ]] && [[ ! -f "eslint.config.js" ]]; then
+    # Check if TypeScript is present
+    if [[ -f "tsconfig.json" ]] || find . -name "*.ts" -o -name "*.tsx" | head -1 | grep -q .; then
+      echo_color $YELLOW "📝 Creating TypeScript ESLint configuration..."
+      cat > eslint.config.js << 'EOF'
+const typescriptEslint = require('@typescript-eslint/eslint-plugin');
+const typescriptParser = require('@typescript-eslint/parser');
+
+module.exports = [
+  {
+    files: ['**/*.js', '**/*.jsx'],
+    rules: {
+      'no-console': 'warn',
+      'no-unused-vars': 'warn',
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+    },
   },
-  extends: ['eslint:recommended'],
-  parserOptions: {
-    ecmaVersion: 12,
-    sourceType: 'module',
+  {
+    files: ['**/*.ts', '**/*.tsx'],
+    languageOptions: {
+      parser: typescriptParser,
+      parserOptions: {
+        ecmaVersion: 2020,
+        sourceType: 'module',
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
+    },
+    plugins: {
+      '@typescript-eslint': typescriptEslint,
+    },
+    rules: {
+      'no-console': 'warn',
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+      '@typescript-eslint/no-unused-vars': 'warn',
+    },
   },
-  rules: {},
-};
+];
 EOF
-    echo_color $GREEN "✔️ Created basic ESLint configuration."
+    else
+      echo_color $YELLOW "📝 Creating JavaScript ESLint configuration..."
+      cat > eslint.config.js << 'EOF'
+module.exports = [
+  {
+    files: ['**/*.js', '**/*.jsx'],
+    rules: {
+      'no-console': 'warn',
+      'no-unused-vars': 'warn',
+      semi: ['error', 'always'],
+      quotes: ['error', 'single'],
+    },
+  },
+];
+EOF
+    fi
+    echo_color $GREEN "✔️ Created ESLint configuration."
   fi
 
   # Create basic Prettier config if none exists
@@ -148,7 +204,7 @@ validate_configuration() {
   local issues=0
 
   # Check essential files
-  [[ -f .eslintrc.js ]] || [[ -f .eslintrc.json ]] || { echo_color $RED "⚠️ ESLint config missing"; ((issues++)); }
+  [[ -f .eslintrc.js ]] || [[ -f .eslintrc.json ]] || [[ -f eslint.config.js ]] || { echo_color $RED "⚠️ ESLint config missing"; ((issues++)); }
   [[ -f .prettierrc ]] || { echo_color $RED "⚠️ Prettier config missing"; ((issues++)); }
 
   # Check project-specific configs
@@ -168,6 +224,7 @@ validate_configuration() {
 
   if [[ $issues -eq 0 ]]; then
     echo_color $GREEN "🎉 Setup complete with no issues!"
+    echo_color $BLUE "🤖 AI-powered development automation ready"
   else
     echo_color $YELLOW "⚠️ Setup complete with $issues warnings. See documentation for full details."
   fi
@@ -188,7 +245,7 @@ console.log('🔍 Validating AI-SDLC Setup...\n');
 const checks = [
   {
     name: 'Git Hooks',
-    command: 'ls .git/hooks/pre-commit',
+    command: 'test -f .husky/pre-commit && echo "exists"',
     success: 'Pre-commit hooks installed'
   },
   {
@@ -211,6 +268,7 @@ const checks = [
 let passed = 0;
 let total = checks.length;
 
+// Command checks
 checks.forEach(check => {
   try {
     execSync(check.command, { stdio: 'ignore' });
@@ -242,11 +300,57 @@ EOF
   fi
 }
 
+### SETUP MCP SERVERS (Optional)
+setup_mcp_servers() {
+  echo_color $BLUE "🔌 Setting up MCP (Model Context Protocol) servers..."
+
+  # Check if MCP configuration exists
+  if [[ -f ".mcp.json" ]]; then
+    echo_color $GREEN "✔️ MCP configuration found"
+
+    # Run MCP installer if available
+    if [[ -f "scripts-complex/mcp-installer.js" ]]; then
+      echo_color $BLUE "📦 Installing MCP servers for credit repair development..."
+
+      # Install MCP servers
+      if node scripts-complex/mcp-installer.js; then
+        echo_color $GREEN "✅ MCP servers installed successfully"
+
+        # Run validation
+        if [[ -f "scripts-complex/mcp-validator.js" ]]; then
+          echo_color $BLUE "🔍 Validating MCP server configuration..."
+          if node scripts-complex/mcp-validator.js; then
+            echo_color $GREEN "✅ MCP servers validated successfully"
+          else
+            echo_color $YELLOW "⚠️  MCP validation had warnings - check MCP-VALIDATION-REPORT.md"
+          fi
+        fi
+
+      else
+        echo_color $YELLOW "⚠️  MCP server installation had issues - check logs"
+      fi
+    else
+      echo_color $YELLOW "⚠️  MCP installer script not found - skipping MCP setup"
+    fi
+
+    # Show MCP setup instructions
+    echo_color $BLUE "📋 MCP Setup Instructions:"
+    echo "   1. Add required environment variables to .env file"
+    echo "   2. Run: claude mcp add --config ./.mcp.json"
+    echo "   3. Test: npm run mcp:validate"
+    echo "   4. Check: npm run mcp:status"
+
+  else
+    echo_color $YELLOW "⚠️  MCP configuration not found - skipping MCP setup"
+  fi
+}
+
 main() {
   check_prerequisites
   install_common_dependencies
   detect_and_setup_project
   setup_basic_configuration
+  setup_mcp_servers  # Optional MCP integration
   create_validation_script
   validate_configuration
 }
