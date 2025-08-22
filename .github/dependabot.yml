@@ -43,6 +43,7 @@ updates:
           - "@testing-library/*"
           - "jsdom"
           - "@types/react"
+          - "@types/react-dom"
 
       # Build tools
       build-tools:
@@ -56,6 +57,7 @@ updates:
           - "typescript"
           - "@types/*"
           - "@types/react"
+          - "@types/react-dom"
 
       # Linting and formatting
       code-quality:
@@ -67,6 +69,7 @@ updates:
           - "lint-staged"
           - "husky"
           - "@types/react"
+          - "@types/react-dom"
 
       # React ecosystem
       react:
