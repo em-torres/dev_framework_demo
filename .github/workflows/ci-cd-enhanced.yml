@@ -148,6 +148,10 @@ jobs:
           npm run lint
           npm run format -- --check
 
+      - name: 📦 Install Dependencies for Type Check
+        if: matrix.check == 'type-check'
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
+
       - name: 🔍 TypeScript Check
         if: matrix.check == 'type-check'
         run: npm run type-check
@@ -219,7 +223,7 @@ jobs:
 
       - name: 🔗 Integration Tests
         if: matrix.test-type == 'integration'
-        run: npm run test:smart
+        run: npm run test:changed
 
       - name: 🎭 E2E Tests
         if: matrix.test-type == 'e2e'
