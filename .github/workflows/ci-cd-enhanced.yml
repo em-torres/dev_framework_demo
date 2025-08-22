@@ -65,12 +65,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+
+      - name: 📦 Generate Package Lock File
+        run: |
+          if [ ! -f "package-lock.json" ]; then
+            echo "Generating package-lock.json at runtime..."
+            npm install --package-lock-only
+          fi
 
       - name: 📦 Generate Cache Keys
         id: cache-keys
         run: |
-          echo "cache-key=node-modules-${{ env.CACHE_VERSION }}-${{ hashFiles('**/package-lock.json') }}" >> $GITHUB_OUTPUT
+          echo "cache-key=node-modules-${{ env.CACHE_VERSION }}-${{ hashFiles('**/package.json', '**/package-lock.json') }}" >> $GITHUB_OUTPUT
 
       - name: 📦 Cache Dependencies
         uses: actions/cache@v3
@@ -135,7 +141,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: 📦 Restore Dependencies
         uses: actions/cache@v3
@@ -194,7 +199,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-          cache: 'npm'
 
       - name: 📦 Restore Dependencies
         uses: actions/cache@v3
@@ -261,7 +265,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: 📦 Restore Dependencies
         uses: actions/cache@v3
@@ -339,7 +342,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
 
       - name: 📦 Restore Dependencies
         uses: actions/cache@v3
