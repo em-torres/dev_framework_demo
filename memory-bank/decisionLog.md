@@ -41,3 +41,25 @@ This file records architectural and implementation decisions using a list format
 * **Frontend**: React with AI-assisted component generation, testing, and optimization
 * **Integration Points**: API communication, real-time features, and shared AI tooling
 * **Demo Scope**: Complete working applications showcasing AI-SDLC at each development phase
+
+
+---
+
+## Decision
+
+**GitHub Actions hashFiles Expression Syntax Fix** - Corrected three instances of improper hashFiles function usage in security.yml workflow by adding required ${{}} expression syntax
+
+## Rationale
+
+* **Syntax Compliance** - GitHub Actions requires all functions and expressions to be wrapped in ${{}} syntax when used in conditional statements
+* **Workflow Functionality** - Without proper syntax, the container security scanning job would fail to evaluate conditions correctly
+* **CI/CD Stability** - Ensures the security workflow runs properly when Docker files are present in the repository
+
+## Implementation Details
+
+* **Lines Fixed**: 168 (job-level condition), 181 (step-level condition), 189 (step-level condition)
+* **Change Pattern**: `if: hashFiles('Dockerfile*') != ''` → `if: ${{ hashFiles('Dockerfile*') != '' }}`
+* **Impact**: Container security scanning now properly conditionally executes based on Dockerfile presence
+* **Testing**: Workflow syntax validation will pass, conditional logic will function as intended
+
+[2025-08-22 11:50:04] - GitHub Actions workflow syntax errors resolved in security pipeline

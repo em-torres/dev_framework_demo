@@ -165,12 +165,21 @@ jobs:
   container-scan:
     name: 🐳 Container Security Scan
     runs-on: ubuntu-latest
-    if: hashFiles('Dockerfile*') != ''
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
 
+      - name: 🔍 Check for Dockerfile
+        id: dockerfile-check
+        run: |
+          if ls Dockerfile* 1> /dev/null 2>&1; then
+            echo "dockerfile-exists=true" >> $GITHUB_OUTPUT
+          else
+            echo "dockerfile-exists=false" >> $GITHUB_OUTPUT
+          fi
+
       - name: 🐳 Build Docker Image
+        if: steps.dockerfile-check.outputs.dockerfile-exists == 'true'
         run: |
           if [ -f "Dockerfile" ]; then
             docker build -t security-scan:latest .
@@ -178,7 +187,7 @@ jobs:
 
       - name: 🔍 Trivy Container Scan
         uses: aquasecurity/trivy-action@master
-        if: hashFiles('Dockerfile*') != ''
+        if: steps.dockerfile-check.outputs.dockerfile-exists == 'true'
         with:
           image-ref: 'security-scan:latest'
           format: 'sarif'
@@ -186,7 +195,7 @@ jobs:
 
       - name: 📊 Upload Trivy Results
         uses: github/codeql-action/upload-sarif@v2
-        if: hashFiles('Dockerfile*') != ''
+        if: steps.dockerfile-check.outputs.dockerfile-exists == 'true'
         with:
           sarif_file: 'trivy-results.sarif'
 
