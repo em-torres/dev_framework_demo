@@ -28,7 +28,7 @@ on:
         type: boolean
 
 env:
-  NODE_VERSION: '18'
+  NODE_VERSION: '20'
   CACHE_VERSION: v1
   SONAR_ORGANIZATION: thecreditpros
   REGISTRY: ghcr.io
@@ -50,7 +50,6 @@ jobs:
     name: 🔧 Setup & Validation
     runs-on: ubuntu-latest
     outputs:
-      cache-key: ${{ steps.cache-keys.outputs.cache-key }}
       should-deploy: ${{ steps.deploy-check.outputs.should-deploy }}
       environment: ${{ steps.deploy-check.outputs.environment }}
       version: ${{ steps.version.outputs.version }}
@@ -70,27 +69,18 @@ jobs:
         run: |
           if [ ! -f "package-lock.json" ]; then
             echo "Generating package-lock.json at runtime..."
-            npm install --package-lock-only
+            npm install --package-lock-only --ignore-scripts
           fi
 
-      - name: 📦 Generate Cache Keys
-        id: cache-keys
-        run: |
-          echo "cache-key=node-modules-${{ env.CACHE_VERSION }}-${{ hashFiles('**/package.json', '**/package-lock.json') }}" >> $GITHUB_OUTPUT
-
-      - name: 📦 Cache Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-            .eslintcache
-          key: ${{ steps.cache-keys.outputs.cache-key }}
-          restore-keys: |
-            node-modules-${{ env.CACHE_VERSION }}-
 
       - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
+        
+      - name: 🔧 Setup Husky (if needed)
+        run: |
+          if [ -d ".husky" ]; then
+            npx husky install
+          fi
 
       - name: 🔍 Validate Package Structure
         run: |
@@ -142,17 +132,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 📦 Restore Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-            .eslintcache
-          key: ${{ needs.setup.outputs.cache-key }}
+      - name: 📦 Generate Package Lock File
+        run: |
+          if [ ! -f "package-lock.json" ]; then
+            echo "Generating package-lock.json at runtime..."
+            npm install --package-lock-only --ignore-scripts
+          fi
 
       - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
 
       - name: 🔍 ESLint Check
         if: matrix.check == 'lint'
@@ -190,7 +178,7 @@ jobs:
     strategy:
       matrix:
         test-type: [unit, integration, e2e]
-        node-version: [18, 20]
+        node-version: [20, 22]
     steps:
       - name: 📥 Checkout Repository
         uses: actions/checkout@v4
@@ -200,17 +188,15 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
 
-      - name: 📦 Restore Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-            .eslintcache
-          key: ${{ needs.setup.outputs.cache-key }}
+      - name: 📦 Generate Package Lock File
+        run: |
+          if [ ! -f "package-lock.json" ]; then
+            echo "Generating package-lock.json at runtime..."
+            npm install --package-lock-only --ignore-scripts
+          fi
 
       - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
 
       - name: 🧪 Unit Tests
         if: matrix.test-type == 'unit'
@@ -229,7 +215,7 @@ jobs:
           npm run test:e2e
 
       - name: 📊 Upload Coverage Reports
-        if: matrix.test-type == 'unit' && matrix.node-version == '18'
+        if: matrix.test-type == 'unit' && matrix.node-version == '20'
         uses: codecov/codecov-action@v3
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -266,22 +252,20 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 📦 Restore Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-            .eslintcache
-          key: ${{ needs.setup.outputs.cache-key }}
+      - name: 📦 Generate Package Lock File
+        run: |
+          if [ ! -f "package-lock.json" ]; then
+            echo "Generating package-lock.json at runtime..."
+            npm install --package-lock-only --ignore-scripts
+          fi
 
       - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
 
       - name: 📊 Download Coverage Reports
         uses: actions/download-artifact@v4
         with:
-          name: test-results-unit-node18
+          name: test-results-unit-node20
           path: ./
 
       - name: 📊 SonarCloud Scan
@@ -343,17 +327,15 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
 
-      - name: 📦 Restore Dependencies
-        uses: actions/cache@v3
-        with:
-          path: |
-            ~/.npm
-            node_modules
-            .eslintcache
-          key: ${{ needs.setup.outputs.cache-key }}
+      - name: 📦 Generate Package Lock File
+        run: |
+          if [ ! -f "package-lock.json" ]; then
+            echo "Generating package-lock.json at runtime..."
+            npm install --package-lock-only --ignore-scripts
+          fi
 
       - name: 📦 Install Dependencies
-        run: npm ci --prefer-offline --no-audit
+        run: npm ci --prefer-offline --no-audit --ignore-scripts
 
       - name: 🏗️ Build Application
         run: npm run build
