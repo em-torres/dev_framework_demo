@@ -102,13 +102,23 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: 🔐 TruffleHog Secret Scan
+      - name: 🔐 TruffleHog Secret Scan (Diff)
         uses: trufflesecurity/trufflehog@main
         with:
           path: ./
           base: main
           head: HEAD
           extra_args: --debug --only-verified
+        continue-on-error: true
+        if: github.event.before != github.event.after
+
+      - name: 🔐 TruffleHog Secret Scan (Full)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --debug --only-verified
+        continue-on-error: true
+        if: github.event.before == github.event.after || github.event.before == null
 
       - name: 🔐 GitLeaks Secret Scan
         uses: gitleaks/gitleaks-action@v2
