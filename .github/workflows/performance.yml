@@ -133,7 +133,7 @@ jobs:
 
       - name: 📦 Generate Package Lock & Install Dependencies
         run: |
-          npm install --package-lock-only --ignore-scripts
+          npm install --package-lock-only --ignore-scripts --force
           npm ci --ignore-scripts
 
       - name: 🧠 Memory Leak Detection

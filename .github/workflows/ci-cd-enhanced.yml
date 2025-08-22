@@ -69,7 +69,7 @@ jobs:
         run: |
           if [ ! -f "package-lock.json" ]; then
             echo "Generating package-lock.json at runtime..."
-            npm install --package-lock-only --ignore-scripts
+            npm install --package-lock-only --ignore-scripts --force
           fi
 
 
@@ -136,7 +136,7 @@ jobs:
         run: |
           if [ ! -f "package-lock.json" ]; then
             echo "Generating package-lock.json at runtime..."
-            npm install --package-lock-only --ignore-scripts
+            npm install --package-lock-only --ignore-scripts --force
           fi
 
       - name: 📦 Install Dependencies
@@ -192,7 +192,7 @@ jobs:
         run: |
           if [ ! -f "package-lock.json" ]; then
             echo "Generating package-lock.json at runtime..."
-            npm install --package-lock-only --ignore-scripts
+            npm install --package-lock-only --ignore-scripts --force
           fi
 
       - name: 📦 Install Dependencies
@@ -256,7 +256,7 @@ jobs:
         run: |
           if [ ! -f "package-lock.json" ]; then
             echo "Generating package-lock.json at runtime..."
-            npm install --package-lock-only --ignore-scripts
+            npm install --package-lock-only --ignore-scripts --force
           fi
 
       - name: 📦 Install Dependencies
@@ -331,7 +331,7 @@ jobs:
         run: |
           if [ ! -f "package-lock.json" ]; then
             echo "Generating package-lock.json at runtime..."
-            npm install --package-lock-only --ignore-scripts
+            npm install --package-lock-only --ignore-scripts --force
           fi
 
       - name: 📦 Install Dependencies
