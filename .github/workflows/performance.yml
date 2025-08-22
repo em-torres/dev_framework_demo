@@ -45,11 +45,12 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '20'
 
-      - name: 📦 Install Dependencies
-        run: npm ci
+      - name: 📦 Generate Package Lock & Install Dependencies
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm ci --ignore-scripts
 
       - name: 🏗️ Build Application
         run: npm run build
@@ -87,11 +88,12 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '20'
 
-      - name: 📦 Install Dependencies
-        run: npm ci
+      - name: 📦 Generate Package Lock & Install Dependencies
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm ci --ignore-scripts
 
       - name: 🏗️ Build Application
         run: npm run build
@@ -127,11 +129,12 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '20'
 
-      - name: 📦 Install Dependencies
-        run: npm ci
+      - name: 📦 Generate Package Lock & Install Dependencies
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm ci --ignore-scripts
 
       - name: 🧠 Memory Leak Detection
         run: |
@@ -170,11 +173,12 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
-          cache: 'npm'
+          node-version: '20'
 
-      - name: 📦 Install Dependencies
-        run: npm ci
+      - name: 📦 Generate Package Lock & Install Dependencies
+        run: |
+          npm install --package-lock-only --ignore-scripts
+          npm ci --ignore-scripts
 
       - name: 🏦 Credit Score Calculation Performance
         run: |
