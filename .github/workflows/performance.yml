@@ -128,8 +128,13 @@ jobs:
         uses: treosh/lighthouse-ci-action@v10
         with:
           configPath: './lighthouse.config.js'
-          uploadArtifacts: true
-          temporaryPublicStorage: true
+          uploadArtifacts: false
+
+      - name: 📊 Upload Lighthouse Report
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-report
+          path: .lighthouseci/
 
       - name: 📊 Performance Budget Check
         run: |
